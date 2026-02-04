@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be.Design - 3D Crowd Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;1,600&family=IBM+Plex+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ocean-deep: #0B2447;
+            --ocean-mid: #19376D;
+            --sky-blue: #576CBC;
+            --soft-light: #A5D7E8;
+            --warm-white: #FFF8F0;
+            --accent-coral: #FF6B6B;
+        }
+
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-mid) 100%);
+            color: var(--warm-white);
+            overflow: hidden;
+        }
+
+        .hero-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 3D Canvas */
+        #crowdCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Loading screen */
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-mid) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(165, 215, 232, 0.2);
+            border-top-color: var(--soft-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .loading-progress {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--soft-light);
+        }
+
+        .loading-filesize {
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+
+        /* Error message */
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            text-align: center;
+            z-index: 200;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .error-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-coral);
+        }
+
+        .error-details {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        /* Atmosphere */
+        .atmosphere {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 40%, rgba(165, 215, 232, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 60%, rgba(87, 108, 188, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(11, 36, 71, 0.6) 100%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2.5rem 4rem;
+        }
+
+        .logo {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--warm-white);
+            letter-spacing: 0.02em;
+        }
+
+        .logo strong {
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255, 248, 240, 0.8);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--soft-light);
+        }
+
+        /* Content overlay */
+        .content-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            padding: 4rem;
+            background: linear-gradient(to top, rgba(11, 36, 71, 0.9) 0%, rgba(11, 36, 71, 0.7) 50%, transparent 100%);
+        }
+
+        .main-message {
+            font-family: 'Crimson Pro', serif;
+            font-size: clamp(3rem, 10vw, 10rem);
+            font-weight: 300;
+            line-height: 0.9;
+            margin-bottom: 3rem;
+        }
+
+        .main-message .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .main-message .word {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(120px);
+            animation: revealWord 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .main-message .word-human { 
+            animation-delay: 0.2s; 
+            font-style: italic;
+            font-weight: 600;
+            color: var(--soft-light);
+        }
+
+        .main-message .word-curious { 
+            animation-delay: 0.4s; 
+            font-style: italic;
+            font-weight: 600;
+            color: var(--sky-blue);
+        }
+
+        .main-message .word-design { 
+            animation-delay: 0.6s; 
+            font-style: italic;
+            font-weight: 600;
+            color: var(--accent-coral);
+        }
+
+        .main-message .word-be { 
+            opacity: 0;
+            animation: revealWord 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .main-message .word-be-1 { animation-delay: 0.1s; }
+        .main-message .word-be-2 { animation-delay: 0.3s; }
+        .main-message .word-be-3 { animation-delay: 0.5s; }
+
+        @keyframes revealWord {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tagline {
+            font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+            font-weight: 300;
+            line-height: 1.8;
+            max-width: 700px;
+            letter-spacing: 0.02em;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 0.8s;
+        }
+
+        .tagline strong {
+            color: var(--soft-light);
+            font-weight: 400;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .interaction-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            animation: hintPulse 5s ease-in-out 2s;
+        }
+
+        .hint-main {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .hint-sub {
+            font-size: 0.8rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        @keyframes hintPulse {
+            0%, 100% { opacity: 0; }
+            25%, 75% { opacity: 1; }
+        }
+
+        /* Performance indicator */
+        .fps-counter {
+            position: fixed;
+            top: 6rem;
+            right: 2rem;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            z-index: 100;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 2rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+                font-size: 0.65rem;
+            }
+
+            .content-overlay {
+                padding: 2rem;
+            }
+
+            .main-message {
+                font-size: clamp(2rem, 12vw, 5rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-container">
+        <!-- Loading screen -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading 3D Crowd</div>
+            <div class="loading-progress" id="loadingProgress">0%</div>
+            <div class="loading-filesize" id="loadingFilesize">File size: 6.5MB</div>
+        </div>
+
+        <!-- Error message -->
+        <div class="error-message" id="errorMessage">
+            <div class="error-title">Unable to Load 3D Crowd</div>
+            <div class="error-details" id="errorDetails"></div>
+        </div>
+
+        <!-- 3D Canvas -->
+        <canvas id="crowdCanvas"></canvas>
+
+        <!-- Atmosphere -->
+        <div class="atmosphere"></div>
+        <div class="vignette"></div>
+
+        <!-- Navigation -->
+        <nav>
+            <div class="logo">Be.<strong>Design</strong></div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#work">Our Work</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <!-- FPS Counter -->
+        <div class="fps-counter" id="fpsCounter">FPS: --</div>
+
+        <!-- Interaction hint -->
+        <div class="interaction-hint">
+            <div class="hint-main">Guide them</div>
+            <div class="hint-sub">Move your cursor to lead the crowd</div>
+        </div>
+
+        <!-- Content overlay -->
+        <div class="content-overlay">
+            <h1 class="main-message">
+                <span class="line">
+                    <span class="word word-be word-be-1">Be</span><span class="word word-human">.human</span>
+                </span>
+                <span class="line">
+                    <span class="word word-be word-be-2">Be</span><span class="word word-curious">.curious</span>
+                </span>
+                <span class="line">
+                    <span class="word word-be word-be-3">Be</span><span class="word word-design">.design</span>
+                </span>
+            </h1>
+
+            <p class="tagline">
+                <strong>Design guides people.</strong> Every interaction, every decision point, every journey—shaped by thoughtful design that puts humans first. We create experiences that connect, guide, and empower.
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+        /*
+         * 3D CROWD LOADER - FINAL VERSION
+         * 
+         * File: final-crows-test.glb (6.5MB - optimized!)
+         * Features:
+         * - Real-time 3D crowd with animations
+         * - Cursor following interaction
+         * - Performance monitoring
+         * - Smooth loading experience
+         */
+
+        const canvas = document.getElementById('crowdCanvas');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const loadingProgress = document.getElementById('loadingProgress');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorDetails = document.getElementById('errorDetails');
+        const fpsCounter = document.getElementById('fpsCounter');
+
+        // Three.js scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        camera.position.set(0, 10, 20);
+        camera.lookAt(0, 0, 0);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const directionalLight1 = new THREE.DirectionalLight(0xA5D7E8, 0.8);
+        directionalLight1.position.set(10, 15, 10);
+        scene.add(directionalLight1);
+
+        const directionalLight2 = new THREE.DirectionalLight(0x576CBC, 0.5);
+        directionalLight2.position.set(-10, 10, -10);
+        scene.add(directionalLight2);
+
+        // Mouse tracking
+        const mouse = new THREE.Vector2();
+        const targetPosition = new THREE.Vector3(0, 0, 0);
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            
+            targetPosition.x = mouse.x * 15;
+            targetPosition.z = mouse.y * 10;
+        });
+
+        // Touch support
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches[0]) {
+                mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+                
+                targetPosition.x = mouse.x * 15;
+                targetPosition.z = mouse.y * 10;
+            }
+        });
+
+        // Load GLB model
+        let crowdModel = null;
+        let mixer = null;
+        const clock = new THREE.Clock();
+
+        const loader = new THREE.GLTFLoader();
+        
+        loader.load(
+            // Path to your GLB file
+            './final-crows-test.glb',
+            
+            // Success callback
+            function (gltf) {
+                console.log('✅ 3D crowd loaded successfully!');
+                crowdModel = gltf.scene;
+                scene.add(crowdModel);
+
+                // Set up animations if they exist
+                if (gltf.animations && gltf.animations.length > 0) {
+                    mixer = new THREE.AnimationMixer(crowdModel);
+                    gltf.animations.forEach((clip) => {
+                        mixer.clipAction(clip).play();
+                    });
+                    console.log(`🎬 Playing ${gltf.animations.length} animation(s)`);
+                }
+
+                // Center the model
+                const box = new THREE.Box3().setFromObject(crowdModel);
+                const center = box.getCenter(new THREE.Vector3());
+                crowdModel.position.sub(center);
+
+                // Hide loading screen
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                }, 500);
+
+                // Start animation
+                animate();
+            },
+            
+            // Progress callback
+            function (xhr) {
+                const percentComplete = (xhr.loaded / xhr.total * 100).toFixed(0);
+                loadingProgress.textContent = percentComplete + '%';
+                console.log(`Loading: ${percentComplete}%`);
+            },
+            
+            // Error callback
+            function (error) {
+                console.error('❌ Error loading GLB:', error);
+                loadingScreen.classList.add('hidden');
+                errorMessage.classList.add('show');
+                
+                errorDetails.innerHTML = `
+                    <p><strong>Error:</strong> ${error.message || 'Unknown error'}</p>
+                    <p style="margin-top: 1rem;">Make sure:</p>
+                    <ul style="text-align: left; margin-top: 0.5rem; line-height: 1.8;">
+                        <li>• final-crows-test.glb is in the same folder as this HTML file</li>
+                        <li>• The file was exported from Blender as GLB format</li>
+                        <li>• You're running this from a server (GitHub Pages, local server, etc.)</li>
+                        <li>• The file isn't corrupted</li>
+                    </ul>
+                `;
+            }
+        );
+
+        // FPS monitoring
+        let lastTime = performance.now();
+        let frames = 0;
+        let fps = 0;
+
+        function updateFPS() {
+            frames++;
+            const currentTime = performance.now();
+            if (currentTime >= lastTime + 1000) {
+                fps = Math.round((frames * 1000) / (currentTime - lastTime));
+                fpsCounter.textContent = `FPS: ${fps}`;
+                frames = 0;
+                lastTime = currentTime;
+                
+                // Color code FPS
+                if (fps >= 50) {
+                    fpsCounter.style.color = '#A5D7E8';
+                } else if (fps >= 30) {
+                    fpsCounter.style.color = '#F7B731';
+                } else {
+                    fpsCounter.style.color = '#FF6B6B';
+                }
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+
+            // Update animations
+            if (mixer) {
+                mixer.update(delta);
+            }
+
+            // Rotate crowd slightly toward cursor (subtle interaction)
+            if (crowdModel) {
+                const targetRotation = mouse.x * 0.15; // Subtle rotation
+                crowdModel.rotation.y += (targetRotation - crowdModel.rotation.y) * 0.05;
+            }
+
+            // Gentle camera movement
+            camera.position.x = Math.sin(Date.now() * 0.0001) * 2;
+            camera.position.y = 10 + Math.cos(Date.now() * 0.00015) * 1;
+            camera.lookAt(0, 0, 0);
+
+            renderer.render(scene, camera);
+            
+            updateFPS();
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
