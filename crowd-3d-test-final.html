@@ -140,6 +140,7 @@
     <script type="module">
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
         // Scene setup
         const scene = new THREE.Scene();
@@ -181,10 +182,16 @@
 
         // Load the crowd model
         const loader = new GLTFLoader();
+        
+        // Setup Draco decoder for compressed models
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+        loader.setDRACOLoader(dracoLoader);
+        
         let mixer;
 
         loader.load(
-            'final-crows-test.glb', // Change this to your GLB filename
+            'final-crows-test.glb', // Your GLB filename
             (gltf) => {
                 const crowd = gltf.scene;
                 
