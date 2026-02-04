@@ -8,7 +8,7 @@
         * {
             margin: 0;
             padding: 0;
-            box-features: border-box;
+            box-sizing: border-box;
         }
 
         body {
@@ -146,7 +146,7 @@
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a3a52);
 
-        // Camera - frontal, slightly elevated view matching Blender
+        // Camera - frontal, slightly elevated view
         const camera = new THREE.PerspectiveCamera(
             50,
             window.innerWidth / window.innerHeight,
@@ -189,9 +189,10 @@
         loader.setDRACOLoader(dracoLoader);
         
         let mixer;
+        let crowd;
 
         loader.load(
-            'final-crows-test.glb', // Your GLB filename
+            'final-crows-test.glb',
             (gltf) => {
                 crowd = gltf.scene;
                 
@@ -227,8 +228,9 @@
 
         // Animation loop
         const clock = new THREE.Clock();
-        let crowd;
         let targetPosition = new THREE.Vector3(0, 0, 0);
+        let mouseX = 0;
+        let mouseY = 0;
 
         function animate() {
             requestAnimationFrame(animate);
@@ -239,19 +241,31 @@
                 mixer.update(delta);
             }
 
-            // Make crowd move and rotate towards mouse
+            // Make crowd move and rotate based on mouse
             if (crowd) {
-                // Smoothly move crowd towards target position
+                // Only move left/right (X axis), no forward/back (Z axis)
                 crowd.position.x += (targetPosition.x - crowd.position.x) * 0.05;
-                crowd.position.z += (targetPosition.z - crowd.position.z) * 0.05;
                 
-                // Calculate rotation to face movement direction
+                // Tilt based on mouse Y position instead of moving forward/back
+                const targetTiltX = mouseY * 0.15; // Tilt forward/back
+                crowd.rotation.x += (targetTiltX - crowd.rotation.x) * 0.05;
+                
+                // Calculate rotation to face left/right movement direction
                 const dx = targetPosition.x - crowd.position.x;
-                const dz = targetPosition.z - crowd.position.z;
-                const targetRotation = Math.atan2(dx, dz) + Math.PI; // Added PI to flip direction
                 
-                // Smoothly rotate towards target
-                crowd.rotation.y += (targetRotation - crowd.rotation.y) * 0.1;
+                // Only rotate if moving significantly
+                if (Math.abs(dx) > 0.01) {
+                    const targetRotation = Math.atan2(dx, 1) + Math.PI;
+                    
+                    // Smoothly rotate towards target
+                    let rotDiff = targetRotation - crowd.rotation.y;
+                    
+                    // Normalize rotation difference to [-PI, PI]
+                    while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
+                    while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
+                    
+                    crowd.rotation.y += rotDiff * 0.1;
+                }
             }
 
             renderer.render(scene, camera);
@@ -267,18 +281,14 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         });
 
-        // Mouse tracking - convert screen space to 3D world space
-        let mouseX = 0;
-        let mouseY = 0;
-
+        // Mouse tracking - only horizontal movement
         document.addEventListener('mousemove', (event) => {
             mouseX = (event.clientX / window.innerWidth) * 2 - 1;
             mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
             
-            // Convert screen coordinates to world position
-            // Limit movement to a reasonable area
-            targetPosition.x = mouseX * 5; // Multiply to scale movement range
-            targetPosition.z = mouseY * 3;
+            // Only set X position (left/right)
+            targetPosition.x = mouseX * 5;
+            // Z stays at 0 - no forward/back movement
         });
     </script>
 </body>
