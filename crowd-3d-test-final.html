@@ -195,6 +195,9 @@
             (gltf) => {
                 const crowd = gltf.scene;
                 
+                // Rotate to face the camera (180 degrees)
+                crowd.rotation.y = Math.PI;
+                
                 // Center and scale if needed
                 const box = new THREE.Box3().setFromObject(crowd);
                 const center = box.getCenter(new THREE.Vector3());
