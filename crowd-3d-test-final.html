@@ -228,9 +228,7 @@
         // Animation loop
         const clock = new THREE.Clock();
         let crowd;
-        let mouseTrail = [];
-        const trailLength = 30; // Number of positions to remember
-        let currentTrailIndex = 0;
+        let targetPosition = new THREE.Vector3(0, 0, 0);
 
         function animate() {
             requestAnimationFrame(animate);
@@ -241,37 +239,19 @@
                 mixer.update(delta);
             }
 
-            // Make crowd follow the mouse trail
-            if (crowd && mouseTrail.length > 0) {
-                // Get the target position from the trail (a few steps behind cursor)
-                const trailDelay = 10; // How many steps behind the cursor
-                const targetIndex = Math.max(0, mouseTrail.length - trailDelay);
-                const targetPos = mouseTrail[targetIndex];
+            // Make crowd move and rotate towards mouse
+            if (crowd) {
+                // Smoothly move crowd towards target position
+                crowd.position.x += (targetPosition.x - crowd.position.x) * 0.05;
+                crowd.position.z += (targetPosition.z - crowd.position.z) * 0.05;
                 
-                if (targetPos) {
-                    // Smoothly move crowd towards trail position
-                    const moveSpeed = 0.08;
-                    crowd.position.x += (targetPos.x - crowd.position.x) * moveSpeed;
-                    crowd.position.z += (targetPos.z - crowd.position.z) * moveSpeed;
-                    
-                    // Calculate rotation to face movement direction
-                    const dx = targetPos.x - crowd.position.x;
-                    const dz = targetPos.z - crowd.position.z;
-                    
-                    // Only rotate if moving significantly
-                    if (Math.abs(dx) > 0.01 || Math.abs(dz) > 0.01) {
-                        const targetRotation = Math.atan2(dx, dz) + Math.PI;
-                        
-                        // Smoothly rotate towards target
-                        let rotDiff = targetRotation - crowd.rotation.y;
-                        
-                        // Normalize rotation difference to [-PI, PI]
-                        while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
-                        while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
-                        
-                        crowd.rotation.y += rotDiff * 0.15;
-                    }
-                }
+                // Calculate rotation to face movement direction
+                const dx = targetPosition.x - crowd.position.x;
+                const dz = targetPosition.z - crowd.position.z;
+                const targetRotation = Math.atan2(dx, dz) + Math.PI; // Added PI to flip direction
+                
+                // Smoothly rotate towards target
+                crowd.rotation.y += (targetRotation - crowd.rotation.y) * 0.1;
             }
 
             renderer.render(scene, camera);
@@ -287,32 +267,18 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         });
 
-        // Mouse tracking - record trail of positions
-        let lastMouseTime = 0;
+        // Mouse tracking - convert screen space to 3D world space
+        let mouseX = 0;
+        let mouseY = 0;
 
         document.addEventListener('mousemove', (event) => {
-            const currentTime = Date.now();
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
             
-            // Only add to trail every 50ms to avoid too many points
-            if (currentTime - lastMouseTime > 50) {
-                const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-                const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-                
-                // Convert to world position
-                const worldPos = {
-                    x: mouseX * 5,
-                    z: mouseY * 3
-                };
-                
-                mouseTrail.push(worldPos);
-                
-                // Keep trail at max length
-                if (mouseTrail.length > trailLength) {
-                    mouseTrail.shift();
-                }
-                
-                lastMouseTime = currentTime;
-            }
+            // Convert screen coordinates to world position
+            // Limit movement to a reasonable area
+            targetPosition.x = mouseX * 5; // Multiply to scale movement range
+            targetPosition.z = mouseY * 3;
         });
     </script>
 </body>
