@@ -195,9 +195,6 @@
             (gltf) => {
                 crowd = gltf.scene;
                 
-                // Rotate to face the camera (180 degrees)
-                crowd.rotation.y = Math.PI;
-                
                 // Center and scale if needed
                 const box = new THREE.Box3().setFromObject(crowd);
                 const center = box.getCenter(new THREE.Vector3());
@@ -231,6 +228,7 @@
         // Animation loop
         const clock = new THREE.Clock();
         let crowd;
+        let targetPosition = new THREE.Vector3(0, 0, 0);
 
         function animate() {
             requestAnimationFrame(animate);
@@ -241,9 +239,19 @@
                 mixer.update(delta);
             }
 
-            // Make crowd rotate to follow mouse
+            // Make crowd move and rotate towards mouse
             if (crowd) {
-                crowd.rotation.y = Math.PI + mouseX * 0.3;
+                // Smoothly move crowd towards target position
+                crowd.position.x += (targetPosition.x - crowd.position.x) * 0.05;
+                crowd.position.z += (targetPosition.z - crowd.position.z) * 0.05;
+                
+                // Calculate rotation to face movement direction
+                const dx = targetPosition.x - crowd.position.x;
+                const dz = targetPosition.z - crowd.position.z;
+                const targetRotation = Math.atan2(dx, dz);
+                
+                // Smoothly rotate towards target
+                crowd.rotation.y += (targetRotation - crowd.rotation.y) * 0.1;
             }
 
             renderer.render(scene, camera);
@@ -259,11 +267,18 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         });
 
-        // Mouse tracking for crowd rotation
+        // Mouse tracking - convert screen space to 3D world space
         let mouseX = 0;
+        let mouseY = 0;
 
         document.addEventListener('mousemove', (event) => {
             mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // Convert screen coordinates to world position
+            // Limit movement to a reasonable area
+            targetPosition.x = mouseX * 5; // Multiply to scale movement range
+            targetPosition.z = mouseY * 3;
         });
     </script>
 </body>
