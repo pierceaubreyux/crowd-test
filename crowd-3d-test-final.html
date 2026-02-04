@@ -32,43 +32,75 @@
             height: 100%;
         }
 
+        /* Add a subtle dark overlay to make text more readable */
+        #canvas-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(26, 58, 82, 0.3) 0%, rgba(26, 58, 82, 0.6) 100%);
+            pointer-events: none;
+        }
+
         #hero-content {
             position: relative;
             z-index: 10;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 80px 40px;
+            padding: 120px 60px;
             color: white;
         }
 
         h1 {
-            font-size: clamp(3rem, 8vw, 6rem);
+            font-size: clamp(4rem, 10vw, 8rem);
             font-weight: 300;
-            line-height: 1.1;
-            margin-bottom: 40px;
+            line-height: 1;
+            margin-bottom: 30px;
+            letter-spacing: -0.02em;
+        }
+
+        .title-prefix {
+            font-weight: 400;
+            font-size: clamp(4rem, 10vw, 8rem);
+            color: white;
         }
 
         .highlight-human {
-            color: #a8c5e0;
+            color: white;
             font-style: italic;
+            font-weight: 300;
         }
 
         .highlight-curious {
-            color: #7a9fc4;
+            color: white;
             font-style: italic;
+            font-weight: 300;
         }
 
         .highlight-design {
-            color: #ff6b6b;
+            color: white;
             font-style: italic;
+            font-weight: 300;
         }
 
         .tagline {
-            font-size: clamp(1rem, 2vw, 1.25rem);
-            max-width: 600px;
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.9);
-            font-family: 'Courier New', monospace;
+            font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+            max-width: 700px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 400;
+            margin-bottom: 40px;
+        }
+
+        .footer-tags {
+            font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: white;
+            margin-top: 20px;
         }
 
         #loading {
@@ -118,13 +150,16 @@
 
         <div id="hero-content">
             <h1>
-                <span class="highlight-human">Human</span><br>
-                <span class="highlight-curious">Curious</span><br>
-                <span class="highlight-design">Design</span>
+                <span class="title-prefix">Be.</span><span class="highlight-human">human</span> 
+                <span class="title-prefix">Be.</span><span class="highlight-curious">curious</span> 
+                <span class="title-prefix">Be.</span><span class="highlight-design">design</span>
             </h1>
             <p class="tagline">
-                Every interaction, every decision point, every touchpoint. Thoughtful design that puts humans first—creates connections that guide, and empower.
+                specialising in bridging empathy-driven research with intuitive, scalable design.
             </p>
+            <div class="footer-tags">
+                HUMAN COMPUTER INTERACTION | ACCESSIBLE DESIGN | STRATEGIC VISUALS | HUMAN COMPLEXITY
+            </div>
         </div>
     </section>
 
