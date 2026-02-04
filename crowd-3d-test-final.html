@@ -197,7 +197,7 @@
                 crowd = gltf.scene;
                 
                 // Scale up the crowd
-                crowd.scale.set(2, 2, 2); // Make them 2x bigger
+                crowd.scale.set(2.5, 2.5, 2.5); // Make them 2.5x bigger
                 
                 // Center and scale if needed
                 const box = new THREE.Box3().setFromObject(crowd);
@@ -250,7 +250,7 @@
                 crowd.position.x += (targetPosition.x - crowd.position.x) * 0.05;
                 
                 // Tilt based on mouse Y position instead of moving forward/back
-                const targetTiltX = -mouseY * 0.15; // Reversed: mouse up = tilt up
+                const targetTiltX = -mouseY * 0.25; // Reversed: mouse up = tilt up, increased from 0.15
                 crowd.rotation.x += (targetTiltX - crowd.rotation.x) * 0.05;
                 
                 // Calculate rotation to face left/right movement direction
