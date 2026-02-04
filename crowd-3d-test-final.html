@@ -20,8 +20,22 @@
             position: relative;
             width: 100%;
             height: 100vh;
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            background: linear-gradient(135deg, #1a5570 0%, #2d758f 30%, #4a9ec4 70%, #5eb5d8 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             overflow: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         #canvas-container {
@@ -30,9 +44,10 @@
             left: 0;
             width: 100%;
             height: 100%;
+            opacity: 0.85;
         }
 
-        /* Add a subtle dark overlay to make text more readable */
+        /* Ethereal blue atmospheric overlay */
         #canvas-container::after {
             content: '';
             position: absolute;
@@ -40,30 +55,77 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(26, 58, 82, 0.3) 0%, rgba(26, 58, 82, 0.6) 100%);
+            background: radial-gradient(ellipse at center, rgba(30, 90, 122, 0.2) 0%, rgba(30, 90, 122, 0.6) 100%);
             pointer-events: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            z-index: 20;
+            display: flex;
+            gap: 40px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 400;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.7;
+        }
+
+        /* Logo */
+        .logo {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            z-index: 20;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        .logo-be {
+            font-weight: 400;
+        }
+
+        .logo-design {
+            font-style: italic;
+            font-weight: 300;
         }
 
         #hero-content {
             position: relative;
             z-index: 10;
-            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100%;
+            padding: 0 60px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 120px 60px;
             color: white;
         }
 
         h1 {
-            font-size: clamp(4rem, 10vw, 8rem);
+            font-size: clamp(3.5rem, 9vw, 7.5rem);
             font-weight: 300;
-            line-height: 1;
-            margin-bottom: 30px;
+            line-height: 1.1;
+            margin-bottom: 60px;
             letter-spacing: -0.02em;
         }
 
         .title-prefix {
             font-weight: 400;
-            font-size: clamp(4rem, 10vw, 8rem);
+            font-size: clamp(3.5rem, 9vw, 7.5rem);
             color: white;
         }
 
@@ -85,22 +147,28 @@
             font-weight: 300;
         }
 
+        /* Three column tagline section */
+        .tagline-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            width: 100%;
+            margin-bottom: 60px;
+        }
+
         .tagline {
-            font-size: clamp(0.95rem, 1.8vw, 1.1rem);
-            max-width: 700px;
-            line-height: 1.7;
-            color: rgba(255, 255, 255, 0.95);
-            font-weight: 400;
-            margin-bottom: 40px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
         }
 
         .footer-tags {
-            font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+            font-size: 0.85rem;
             font-weight: 600;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
             color: white;
-            margin-top: 20px;
         }
 
         #loading {
@@ -129,18 +197,48 @@
         }
 
         @media (max-width: 768px) {
+            nav {
+                top: 20px;
+                right: 20px;
+                gap: 20px;
+            }
+
+            .logo {
+                top: 20px;
+                left: 20px;
+            }
+
             #hero-content {
-                padding: 60px 20px;
+                padding: 0 20px;
             }
 
             h1 {
                 font-size: 2.5rem;
+                margin-bottom: 40px;
+            }
+
+            .tagline-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
             }
         }
     </style>
 </head>
 <body>
     <section id="hero-section">
+        <!-- Logo -->
+        <div class="logo">
+            <span class="logo-be">Be.</span><span class="logo-design">Design</span>
+        </div>
+
+        <!-- Navigation -->
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#work">Our Work</a>
+            <a href="#contact">Contact</a>
+        </nav>
+
         <div id="canvas-container"></div>
         
         <div id="loading">
@@ -150,13 +248,23 @@
 
         <div id="hero-content">
             <h1>
-                <span class="title-prefix">Be.</span><span class="highlight-human">human</span> 
-                <span class="title-prefix">Be.</span><span class="highlight-curious">curious</span> 
-                <span class="title-prefix">Be.</span><span class="highlight-design">design</span>
+                <span class="title-prefix">Be.</span><span class="highlight-human">inspired</span> 
+                <span class="title-prefix">Be.</span><span class="highlight-curious">immersed</span> 
+                <span class="title-prefix">Be.</span><span class="highlight-design">intentional</span>
             </h1>
-            <p class="tagline">
-                specialising in bridging empathy-driven research with intuitive, scalable design.
-            </p>
+            
+            <div class="tagline-grid">
+                <p class="tagline">
+                    Great design guides users naturally, shaping behaviour, driving outcomes, creating impact.
+                </p>
+                <p class="tagline">
+                    Great design guides users naturally, shaping behaviour, driving outcomes, creating impact.
+                </p>
+                <p class="tagline">
+                    Great design guides users naturally, shaping behaviour, driving outcomes, creating impact.
+                </p>
+            </div>
+
             <div class="footer-tags">
                 HUMAN COMPUTER INTERACTION | ACCESSIBLE DESIGN | STRATEGIC VISUALS | HUMAN COMPLEXITY
             </div>
@@ -179,7 +287,7 @@
 
         // Scene setup
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1a3a52);
+        scene.background = null; // Transparent to show the ethereal blue gradient
 
         // Camera - frontal, slightly elevated view
         const camera = new THREE.PerspectiveCamera(
