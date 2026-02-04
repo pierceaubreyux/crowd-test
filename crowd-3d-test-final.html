@@ -448,8 +448,9 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         
-        camera.position.set(0, 10, 20);
-        camera.lookAt(0, 0, 0);
+        // Camera positioned to see crowd from front (like Blender viewport)
+        camera.position.set(0, 1.5, 8);  // Front view, at eye level
+        camera.lookAt(0, 1, 0);  // Looking at center of crowd
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
