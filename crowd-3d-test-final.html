@@ -248,7 +248,7 @@
                 // Calculate rotation to face movement direction
                 const dx = targetPosition.x - crowd.position.x;
                 const dz = targetPosition.z - crowd.position.z;
-                const targetRotation = Math.atan2(dx, dz);
+                const targetRotation = Math.atan2(dx, dz) + Math.PI; // Added PI to flip direction
                 
                 // Smoothly rotate towards target
                 crowd.rotation.y += (targetRotation - crowd.rotation.y) * 0.1;
