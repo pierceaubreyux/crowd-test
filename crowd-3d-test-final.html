@@ -15,12 +15,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow-x: hidden;
             background: white;
-            /* Smooth scroll inertia for webkit browsers */
-            -webkit-overflow-scrolling: touch;
-        }
-
-        html {
-            scroll-behavior: smooth;
         }
 
         /* Sticky hero container */
@@ -655,15 +649,15 @@
         const scene = new THREE.Scene();
         scene.background = null; // Transparent to show the ethereal gradient
 
-        // Camera - frontal, slightly elevated view
+        // Camera - frontal, centered view
         const camera = new THREE.PerspectiveCamera(
             50,
             window.innerWidth / window.innerHeight,
             0.1,
             1000
         );
-        camera.position.set(0, 2.2, 12); // Raised from 1.8 to 2.2
-        camera.lookAt(0, 1.2, 0); // Look slightly lower
+        camera.position.set(0, 1.5, 12); // Lowered to center crowd better
+        camera.lookAt(0, 1.5, 0); // Look at center height
 
         // Renderer
         const renderer = new THREE.WebGLRenderer({ 
@@ -708,11 +702,11 @@
                 // Scale up the crowd
                 crowd.scale.set(5, 5, 5);
                 
-                // Center and scale if needed
+                // Center and position crowd
                 const box = new THREE.Box3().setFromObject(crowd);
                 const center = box.getCenter(new THREE.Vector3());
                 crowd.position.sub(center);
-                crowd.position.y = -0.3; // Moved down from 0 to -0.3 to prevent clipping
+                crowd.position.y = 0; // Centered at origin
 
                 scene.add(crowd);
 
@@ -805,44 +799,6 @@
 
         // Wait for DOM to be fully loaded
         window.addEventListener('DOMContentLoaded', () => {
-            // Smooth momentum scrolling with real inertia
-            let scrollVelocity = 0;
-            let lastScrollY = window.scrollY;
-            let lastTimestamp = Date.now();
-            let rafId = null;
-            let isScrolling = false;
-            let scrollTimeout = null;
-            
-            const friction = 0.92; // Higher = more glide (0.9-0.95 feels best)
-            const minVelocity = 0.1; // Stop threshold
-
-            // Track actual scroll events
-            window.addEventListener('scroll', () => {
-                const now = Date.now();
-                const currentScrollY = window.scrollY;
-                const timeDelta = Math.max(now - lastTimestamp, 1);
-                
-                // Calculate velocity based on scroll distance over time
-                const scrollDelta = currentScrollY - lastScrollY;
-                scrollVelocity = (scrollDelta / timeDelta) * 16; // Normalize to 60fps
-                
-                lastScrollY = currentScrollY;
-                lastTimestamp = now;
-                isScrolling = true;
-                
-                // Clear existing timeout
-                clearTimeout(scrollTimeout);
-                
-                // Detect when user stops scrolling
-                scrollTimeout = setTimeout(() => {
-                    isScrolling = false;
-                    // Start momentum animation
-                    if (!rafId) {
-                        applyMomentum();
-                    }
-                }, 50);
-            }, { passive: true });
-
             // Expanding gradient circle on scroll
             const expandingGradient = document.querySelector('.expanding-gradient-bg');
             const gradientReturnSection = document.querySelector('.gradient-return-section');
@@ -856,7 +812,8 @@
             const whiteSectionH2 = document.querySelector('.white-section h2');
             const whiteSectionPs = document.querySelectorAll('.white-section p');
 
-            function handleScrollEffects(scrollY) {
+            function handleScrollEffects() {
+                const scrollY = window.scrollY;
                 const viewportHeight = window.innerHeight;
                 
                 // Get hero section and gradient elements
@@ -876,7 +833,6 @@
                     const hideThreshold = gradientSectionTop - viewportHeight * 0.5;
                     
                     if (scrollY > hideThreshold) {
-                        // Completely hide all hero gradient elements
                         heroSection.style.setProperty('--gradient-opacity', '0');
                         orbs.forEach(orb => {
                             if (orb) orb.style.opacity = '0';
@@ -885,7 +841,6 @@
                         if (vignette) vignette.style.opacity = '0';
                         if (canvasContainer) canvasContainer.style.opacity = '0';
                     } else {
-                        // Show them normally
                         heroSection.style.setProperty('--gradient-opacity', '1');
                         orbs.forEach(orb => {
                             if (orb) orb.style.opacity = '';
@@ -938,43 +893,11 @@
                 }
             }
 
-            // Apply momentum when user stops scrolling
-            function applyMomentum() {
-                if (isScrolling) {
-                    // User is actively scrolling, stop momentum
-                    rafId = null;
-                    return;
-                }
-                
-                // Apply friction
-                scrollVelocity *= friction;
-                
-                // Stop if velocity is too small
-                if (Math.abs(scrollVelocity) < minVelocity) {
-                    scrollVelocity = 0;
-                    rafId = null;
-                    return;
-                }
-                
-                // Apply velocity to scroll position
-                const newScrollY = window.scrollY + scrollVelocity;
-                window.scrollTo(0, newScrollY);
-                
-                // Continue animation
-                rafId = requestAnimationFrame(applyMomentum);
-            }
-
-            // Listen for actual scroll to update effects
-            function onScroll() {
-                handleScrollEffects(window.scrollY);
-                requestAnimationFrame(onScroll);
-            }
+            // Listen to scroll events directly
+            window.addEventListener('scroll', handleScrollEffects, { passive: true });
 
             // Initial reveal check
-            handleScrollEffects(window.scrollY);
-            
-            // Start continuous scroll effects monitoring
-            onScroll();
+            handleScrollEffects();
         });
     </script>
 </body>
