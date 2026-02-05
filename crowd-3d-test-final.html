@@ -20,22 +20,137 @@
             position: relative;
             width: 100%;
             height: 100vh;
-            background: linear-gradient(135deg, #1a5570 0%, #2d758f 30%, #4a9ec4 70%, #5eb5d8 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            background: #0a4d5c;
             overflow: hidden;
         }
 
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
+        /* Base gradient layer with breathing effect */
+        #hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 100% 80% at 50% 0%, #14b8a6 0%, transparent 60%),
+                radial-gradient(ellipse 80% 60% at 80% 30%, #06b6d4 0%, transparent 50%),
+                radial-gradient(ellipse 70% 60% at 20% 40%, #0891b2 0%, transparent 50%),
+                radial-gradient(ellipse 120% 100% at 50% 100%, #134e4a 0%, transparent 60%),
+                linear-gradient(135deg, #0f766e 0%, #164e63 50%, #134e4a 100%);
+            opacity: 1;
+            animation: breathe 8s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
             }
             50% {
-                background-position: 100% 50%;
+                transform: scale(1.05);
+                opacity: 0.95;
             }
-            100% {
-                background-position: 0% 50%;
+        }
+
+        /* Animated gradient orbs */
+        .gradient-orb-1 {
+            position: absolute;
+            width: 1000px;
+            height: 1000px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.6) 0%, transparent 60%);
+            filter: blur(120px);
+            top: -30%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: float1 18s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        .gradient-orb-2 {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.5) 0%, transparent 65%);
+            filter: blur(100px);
+            bottom: -10%;
+            right: 15%;
+            animation: float2 15s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        .gradient-orb-3 {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(8, 145, 178, 0.4) 0%, transparent 70%);
+            filter: blur(90px);
+            top: 30%;
+            left: 10%;
+            animation: float3 20s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        @keyframes float1 {
+            0%, 100% { 
+                transform: translateX(-50%) translateY(0) scale(1);
+                opacity: 0.6;
             }
+            33% { 
+                transform: translateX(-45%) translateY(-60px) scale(1.1);
+                opacity: 0.7;
+            }
+            66% { 
+                transform: translateX(-55%) translateY(40px) scale(0.95);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes float2 {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 0.5;
+            }
+            33% { 
+                transform: translate(-70px, 40px) scale(1.12);
+                opacity: 0.6;
+            }
+            66% { 
+                transform: translate(50px, -50px) scale(0.9);
+                opacity: 0.45;
+            }
+        }
+
+        @keyframes float3 {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 0.4;
+            }
+            50% { 
+                transform: translate(-80px, 60px) scale(1.15);
+                opacity: 0.5;
+            }
+        }
+
+        /* Noise texture for depth */
+        .noise-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.015;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* Subtle vignette */
+        .vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 77, 92, 0.3) 100%);
+            pointer-events: none;
+            z-index: 4;
         }
 
         #canvas-container {
@@ -45,18 +160,7 @@
             width: 100%;
             height: 100%;
             opacity: 0.85;
-        }
-
-        /* Ethereal blue atmospheric overlay */
-        #canvas-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, rgba(30, 90, 122, 0.2) 0%, rgba(30, 90, 122, 0.6) 100%);
-            pointer-events: none;
+            z-index: 5;
         }
 
         /* Navigation */
@@ -178,7 +282,7 @@
             transform: translate(-50%, -50%);
             color: white;
             font-size: 1.2rem;
-            z-index: 5;
+            z-index: 25;
         }
 
         .spinner {
@@ -226,6 +330,13 @@
 </head>
 <body>
     <section id="hero-section">
+        <!-- Gradient orbs -->
+        <div class="gradient-orb-1"></div>
+        <div class="gradient-orb-2"></div>
+        <div class="gradient-orb-3"></div>
+        <div class="noise-overlay"></div>
+        <div class="vignette"></div>
+
         <!-- Logo -->
         <div class="logo">
             <span class="logo-be">Be.</span><span class="logo-design">Design</span>
@@ -287,7 +398,7 @@
 
         // Scene setup
         const scene = new THREE.Scene();
-        scene.background = null; // Transparent to show the ethereal blue gradient
+        scene.background = null; // Transparent to show the ethereal gradient
 
         // Camera - frontal, slightly elevated view
         const camera = new THREE.PerspectiveCamera(
@@ -340,7 +451,7 @@
                 crowd = gltf.scene;
                 
                 // Scale up the crowd
-                crowd.scale.set(5, 5, 5); // Make them 2.5x bigger
+                crowd.scale.set(5, 5, 5);
                 
                 // Center and scale if needed
                 const box = new THREE.Box3().setFromObject(crowd);
@@ -393,7 +504,7 @@
                 crowd.position.x += (targetPosition.x - crowd.position.x) * 0.05;
                 
                 // Tilt based on mouse Y position instead of moving forward/back
-                const targetTiltX = -mouseY * 0.25; // Reversed: mouse up = tilt up, increased from 0.15
+                const targetTiltX = -mouseY * 0.25;
                 crowd.rotation.x += (targetTiltX - crowd.rotation.x) * 0.05;
                 
                 // Calculate rotation to face left/right movement direction
