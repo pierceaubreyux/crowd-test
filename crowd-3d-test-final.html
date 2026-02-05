@@ -36,23 +36,30 @@
             background: #0a4d5c;
             overflow: visible;
             padding-bottom: 200px; /* Extra space so content can scroll */
+            --gradient-opacity: 1;
         }
 
         /* Make only the canvas sticky */
         #canvas-container {
-            position: sticky;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100vh;
             opacity: 0.85;
             z-index: 5;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #canvas-container canvas {
+            pointer-events: auto;
         }
 
         /* Base gradient layer with breathing effect */
         #hero-section::before {
             content: '';
-            position: absolute;
+            position: fixed;
             inset: 0;
             background: 
                 radial-gradient(ellipse 100% 80% at 50% 0%, #14b8a6 0%, transparent 60%),
@@ -60,9 +67,11 @@
                 radial-gradient(ellipse 70% 60% at 20% 40%, #0891b2 0%, transparent 50%),
                 radial-gradient(ellipse 120% 100% at 50% 100%, #134e4a 0%, transparent 60%),
                 linear-gradient(135deg, #0f766e 0%, #164e63 50%, #134e4a 100%);
-            opacity: 1;
+            opacity: var(--gradient-opacity, 1);
             animation: breathe 8s ease-in-out infinite;
             z-index: 1;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
         }
 
         @keyframes breathe {
@@ -78,7 +87,7 @@
 
         /* Animated gradient orbs */
         .gradient-orb-1 {
-            position: absolute;
+            position: fixed;
             width: 1000px;
             height: 1000px;
             border-radius: 50%;
@@ -89,10 +98,12 @@
             transform: translateX(-50%);
             animation: float1 18s ease-in-out infinite;
             z-index: 2;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
         }
 
         .gradient-orb-2 {
-            position: absolute;
+            position: fixed;
             width: 700px;
             height: 700px;
             border-radius: 50%;
@@ -102,10 +113,12 @@
             right: 15%;
             animation: float2 15s ease-in-out infinite;
             z-index: 2;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
         }
 
         .gradient-orb-3 {
-            position: absolute;
+            position: fixed;
             width: 600px;
             height: 600px;
             border-radius: 50%;
@@ -115,6 +128,8 @@
             left: 10%;
             animation: float3 20s ease-in-out infinite;
             z-index: 2;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
         }
 
         @keyframes float1 {
@@ -160,7 +175,7 @@
 
         /* Noise texture for depth */
         .noise-overlay {
-            position: absolute;
+            position: fixed;
             inset: 0;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             opacity: 0.015;
@@ -171,7 +186,7 @@
 
         /* Subtle vignette */
         .vignette {
-            position: absolute;
+            position: fixed;
             inset: 0;
             background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 77, 92, 0.3) 100%);
             pointer-events: none;
@@ -787,101 +802,144 @@
             // Z stays at 0 - no forward/back movement
         });
 
-        // Smooth momentum scrolling
-        let targetScroll = 0;
-        let currentScroll = 0;
-        let velocity = 0;
-        const friction = 0.85; // Higher = more glide (0-1)
-        const ease = 0.12;
+        // Wait for DOM to be fully loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            // Smooth momentum scrolling
+            let targetScroll = 0;
+            let currentScroll = 0;
+            let velocity = 0;
+            const friction = 0.85; // Higher = more glide (0-1)
+            const ease = 0.12;
 
-        // Get actual scroll position
-        function updateTargetScroll() {
-            targetScroll = window.scrollY;
-        }
-
-        window.addEventListener('scroll', updateTargetScroll, { passive: true });
-
-        // Apply momentum
-        function applyMomentum() {
-            // Calculate velocity
-            velocity = (targetScroll - currentScroll) * ease;
-            
-            // Apply friction for that glide effect
-            velocity *= friction;
-            
-            // Update current scroll
-            currentScroll += velocity;
-            
-            // Stop when close enough
-            if (Math.abs(velocity) < 0.1) {
-                currentScroll = targetScroll;
-                velocity = 0;
+            // Get actual scroll position
+            function updateTargetScroll() {
+                targetScroll = window.scrollY;
             }
-            
-            handleScrollEffects(currentScroll);
-            requestAnimationFrame(applyMomentum);
-        }
 
-        // Start momentum loop
-        applyMomentum();
+            window.addEventListener('scroll', updateTargetScroll, { passive: true });
 
-        // Expanding gradient circle on scroll
-        const expandingGradient = document.querySelector('.expanding-gradient-bg');
-        const gradientReturnSection = document.querySelector('.gradient-return-section');
-        const gradientReturnContent = document.querySelector('.gradient-return-content');
-        const whiteSection = document.querySelector('.white-section');
+            // Expanding gradient circle on scroll
+            const expandingGradient = document.querySelector('.expanding-gradient-bg');
+            const gradientReturnSection = document.querySelector('.gradient-return-section');
+            const gradientReturnContent = document.querySelector('.gradient-return-content');
+            const whiteSection = document.querySelector('.white-section');
 
-        // Get all revealable elements
-        const heroTitle = document.querySelector('h1');
-        const taglines = document.querySelectorAll('.tagline');
-        const footerTags = document.querySelector('.footer-tags');
-        const whiteSectionH2 = document.querySelector('.white-section h2');
-        const whiteSectionPs = document.querySelectorAll('.white-section p');
+            // Get all revealable elements
+            const heroTitle = document.querySelector('h1');
+            const taglines = document.querySelectorAll('.tagline');
+            const footerTags = document.querySelector('.footer-tags');
+            const whiteSectionH2 = document.querySelector('.white-section h2');
+            const whiteSectionPs = document.querySelectorAll('.white-section p');
 
-        function handleScrollEffects(scrollY) {
-            const viewportHeight = window.innerHeight;
-            
-            // Reveal hero elements on load/scroll
-            if (scrollY < viewportHeight) {
-                heroTitle.classList.add('revealed');
-                taglines.forEach(tag => tag.classList.add('revealed'));
-                footerTags.classList.add('revealed');
-            }
-            
-            // Handle white section reveals
-            const whiteSectionTop = whiteSection.offsetTop;
-            const whiteSectionHeight = whiteSection.offsetHeight;
-            const scrollPosition = scrollY + viewportHeight * 0.7;
-            
-            if (scrollPosition > whiteSectionTop) {
-                whiteSectionH2.classList.add('revealed');
-                whiteSectionPs.forEach(p => p.classList.add('revealed'));
-            }
-            
-            // Handle gradient circle expansion
-            const gradientSectionTop = gradientReturnSection.offsetTop;
-            const gradientSectionHeight = gradientReturnSection.offsetHeight;
-            const viewportScroll = scrollY + viewportHeight;
-            
-            if (viewportScroll > gradientSectionTop) {
-                const progress = Math.min((viewportScroll - gradientSectionTop) / gradientSectionHeight, 1);
+            function handleScrollEffects(scrollY) {
+                const viewportHeight = window.innerHeight;
                 
-                // Expand circle from 100px to full screen coverage
-                const maxSize = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 2.5;
-                const size = 100 + (progress * maxSize);
+                // Get hero section and gradient elements
+                const heroSection = document.getElementById('hero-section');
+                const orbs = [
+                    document.querySelector('.gradient-orb-1'),
+                    document.querySelector('.gradient-orb-2'),
+                    document.querySelector('.gradient-orb-3')
+                ];
+                const noise = document.querySelector('.noise-overlay');
+                const vignette = document.querySelector('.vignette');
+                const canvasContainer = document.getElementById('canvas-container');
                 
-                expandingGradient.style.width = `${size}px`;
-                expandingGradient.style.height = `${size}px`;
+                // Hide hero gradient completely when we reach the gradient return section
+                if (gradientReturnSection) {
+                    const gradientSectionTop = gradientReturnSection.offsetTop;
+                    const hideThreshold = gradientSectionTop - viewportHeight * 0.5;
+                    
+                    if (scrollY > hideThreshold) {
+                        // Completely hide all hero gradient elements
+                        heroSection.style.setProperty('--gradient-opacity', '0');
+                        orbs.forEach(orb => {
+                            if (orb) orb.style.opacity = '0';
+                        });
+                        if (noise) noise.style.opacity = '0';
+                        if (vignette) vignette.style.opacity = '0';
+                        if (canvasContainer) canvasContainer.style.opacity = '0';
+                    } else {
+                        // Show them normally
+                        heroSection.style.setProperty('--gradient-opacity', '1');
+                        orbs.forEach(orb => {
+                            if (orb) orb.style.opacity = '';
+                        });
+                        if (noise) noise.style.opacity = '';
+                        if (vignette) vignette.style.opacity = '';
+                        if (canvasContainer) canvasContainer.style.opacity = '0.85';
+                    }
+                }
                 
-                // Show content when circle is large enough
-                if (progress > 0.3) {
-                    gradientReturnContent.classList.add('visible');
+                // Reveal hero elements on load/scroll
+                if (scrollY < viewportHeight * 1.5) {
+                    if (heroTitle) heroTitle.classList.add('revealed');
+                    if (taglines) taglines.forEach(tag => tag.classList.add('revealed'));
+                    if (footerTags) footerTags.classList.add('revealed');
+                }
+                
+                // Handle white section reveals
+                if (whiteSection) {
+                    const whiteSectionTop = whiteSection.offsetTop;
+                    const scrollPosition = scrollY + viewportHeight * 0.6;
+                    
+                    if (scrollPosition > whiteSectionTop) {
+                        if (whiteSectionH2) whiteSectionH2.classList.add('revealed');
+                        if (whiteSectionPs) whiteSectionPs.forEach(p => p.classList.add('revealed'));
+                    }
+                }
+                
+                // Handle gradient circle expansion
+                if (gradientReturnSection && expandingGradient) {
+                    const gradientSectionTop = gradientReturnSection.offsetTop;
+                    const gradientSectionHeight = gradientReturnSection.offsetHeight;
+                    const viewportScroll = scrollY + viewportHeight;
+                    
+                    if (viewportScroll > gradientSectionTop) {
+                        const progress = Math.min((viewportScroll - gradientSectionTop) / gradientSectionHeight, 1);
+                        
+                        // Expand circle from 100px to full screen coverage
+                        const maxSize = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 2.5;
+                        const size = 100 + (progress * maxSize);
+                        
+                        expandingGradient.style.width = `${size}px`;
+                        expandingGradient.style.height = `${size}px`;
+                        
+                        // Show content when circle is large enough
+                        if (progress > 0.3) {
+                            if (gradientReturnContent) gradientReturnContent.classList.add('visible');
+                        }
+                    }
                 }
             }
-        }
 
-        // Initial reveal check
-        handleScrollEffects(window.scrollY);
+            // Apply momentum
+            function applyMomentum() {
+                // Calculate velocity
+                velocity = (targetScroll - currentScroll) * ease;
+                
+                // Apply friction for that glide effect
+                velocity *= friction;
+                
+                // Update current scroll
+                currentScroll += velocity;
+                
+                // Stop when close enough
+                if (Math.abs(velocity) < 0.1) {
+                    currentScroll = targetScroll;
+                    velocity = 0;
+                }
+                
+                handleScrollEffects(currentScroll);
+                requestAnimationFrame(applyMomentum);
+            }
+
+            // Initial reveal check
+            handleScrollEffects(window.scrollY);
+            
+            // Start momentum loop
+            applyMomentum();
+        });
     </script>
 </body>
 </html>
