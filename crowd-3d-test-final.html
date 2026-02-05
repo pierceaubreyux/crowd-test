@@ -18,25 +18,25 @@
       background: white;
     }
 
-    /* Sticky hero container */
+    /* Sticky hero container - FIXED: Made it actually sticky */
     .hero-sticky-container {
       position: relative;
-      min-height: 100vh;
+      height: 200vh; /* Double height for scroll distance */
     }
 
     #hero-section {
-      position: relative;
+      position: sticky;
+      top: 0;
       width: 100%;
-      min-height: 100vh;
+      height: 100vh;
       background: #0a4d5c;
-      overflow: visible;
-      padding-bottom: 200px; /* Extra space so content can scroll */
+      overflow: hidden;
       --gradient-opacity: 1;
     }
 
     /* Make only the canvas sticky */
     #canvas-container {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
@@ -54,7 +54,7 @@
     /* Base gradient layer with breathing effect */
     #hero-section::before {
       content: '';
-      position: fixed;
+      position: absolute;
       inset: 0;
       background:
         radial-gradient(ellipse 100% 80% at 50% 0%, #14b8a6 0%, transparent 60%),
@@ -82,7 +82,7 @@
 
     /* Animated gradient orbs */
     .gradient-orb-1 {
-      position: fixed;
+      position: absolute;
       width: 1000px;
       height: 1000px;
       border-radius: 50%;
@@ -98,7 +98,7 @@
     }
 
     .gradient-orb-2 {
-      position: fixed;
+      position: absolute;
       width: 700px;
       height: 700px;
       border-radius: 50%;
@@ -113,7 +113,7 @@
     }
 
     .gradient-orb-3 {
-      position: fixed;
+      position: absolute;
       width: 600px;
       height: 600px;
       border-radius: 50%;
@@ -170,7 +170,7 @@
 
     /* Noise texture for depth */
     .noise-overlay {
-      position: fixed;
+      position: absolute;
       inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
       opacity: 0.015;
@@ -181,7 +181,7 @@
 
     /* Subtle vignette */
     .vignette {
-      position: fixed;
+      position: absolute;
       inset: 0;
       background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 77, 92, 0.3) 100%);
       pointer-events: none;
@@ -239,7 +239,6 @@
       opacity: 0.7;
     }
 
-    /* Logo */
     .logo {
       position: absolute;
       top: 40px;
@@ -259,7 +258,6 @@
       font-weight: 300;
     }
 
-    /* (kept as in your file; duplicate #hero-content / h1 definitions removed previously can stay, but leaving them won't break) */
     .title-prefix {
       font-weight: 400;
       font-size: clamp(3.5rem, 9vw, 7.5rem);
@@ -274,7 +272,6 @@
       font-weight: 300;
     }
 
-    /* Three column tagline section */
     .tagline-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -346,40 +343,12 @@
       100% { transform: rotate(360deg); }
     }
 
-    @media (max-width: 768px) {
-      nav {
-        top: 20px;
-        right: 20px;
-        gap: 20px;
-      }
-
-      .logo {
-        top: 20px;
-        left: 20px;
-      }
-
-      #hero-content {
-        padding: 0 20px;
-      }
-
-      h1 {
-        font-size: 2.5rem;
-        margin-bottom: 40px;
-      }
-
-      .tagline-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
-      }
-    }
-
-    /* White content section */
     .white-section {
       position: relative;
       min-height: 100vh;
       background: white;
       padding: 120px 60px;
-      z-index: 100; /* Above fixed hero gradient */
+      z-index: 30;
     }
 
     .white-section-content {
@@ -423,19 +392,18 @@
       transform: translateY(0);
     }
 
-    /* Gradient return section with expanding circle */
     .gradient-return-section {
       position: relative;
       min-height: 150vh;
       background: white;
-      z-index: 100; /* Above everything else */
+      z-index: 30;
     }
 
     .expanding-gradient-bg {
       position: absolute;
       bottom: 0;
       left: 50%;
-      transform: translateX(-50%) translateY(50%); /* Start half-visible at bottom */
+      transform: translateX(-50%) translateY(50%);
       width: 100px;
       height: 100px;
       border-radius: 50%;
@@ -509,7 +477,7 @@
       transform: translateY(0);
     }
 
-    /* ---------------- Inertia scroll scaffold (transform-based, keeps window.scrollY) ---------------- */
+    /* Inertia scroll scaffold */
     html, body { height: 100%; }
 
     body {
@@ -548,25 +516,21 @@
 </head>
 
 <body>
-  <!-- Inertia scroll wrapper -->
   <div id="smooth-wrapper">
     <div id="smooth-content">
 
       <div class="hero-sticky-container">
         <section id="hero-section">
-          <!-- Gradient orbs -->
           <div class="gradient-orb-1"></div>
           <div class="gradient-orb-2"></div>
           <div class="gradient-orb-3"></div>
           <div class="noise-overlay"></div>
           <div class="vignette"></div>
 
-          <!-- Logo -->
           <div class="logo">
             <span class="logo-be">Be.</span><span class="logo-design">Design</span>
           </div>
 
-          <!-- Navigation -->
           <nav>
             <a href="#home">Home</a>
             <a href="#about">About</a>
@@ -607,7 +571,6 @@
         </section>
       </div>
 
-      <!-- White content section -->
       <section class="white-section">
         <div class="white-section-content">
           <h2>Our Approach</h2>
@@ -623,7 +586,6 @@
         </div>
       </section>
 
-      <!-- Gradient return section -->
       <section class="gradient-return-section">
         <div class="expanding-gradient-bg"></div>
         <div class="gradient-return-content">
@@ -651,7 +613,7 @@
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
-    // -------- Inertia Scroll (safe, transform-based, keeps window.scrollY accurate) --------
+    // Inertia Scroll
     const smoothWrapper = document.getElementById('smooth-wrapper');
     const smoothContent = document.getElementById('smooth-content');
 
@@ -659,9 +621,8 @@
     let targetY = 0;
     let maxScroll = 0;
 
-    // Tweak these
-    const ease = 0.085;   // smaller = floatier, bigger = snappier
-    const minDelta = 0.1; // stop threshold
+    const ease = 0.085;
+    const minDelta = 0.1;
 
     function setBodyHeight() {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -699,11 +660,10 @@
       requestAnimationFrame(smoothTick);
     });
 
-    // Scene setup
+    // Three.js Scene
     const scene = new THREE.Scene();
     scene.background = null;
 
-    // Camera - frontal, centered view
     const camera = new THREE.PerspectiveCamera(
       50,
       window.innerWidth / window.innerHeight,
@@ -713,7 +673,6 @@
     camera.position.set(0, 1.5, 12);
     camera.lookAt(0, 1.5, 0);
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true
@@ -723,7 +682,6 @@
     renderer.shadowMap.enabled = true;
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-    // Lighting setup
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
@@ -736,9 +694,7 @@
     rimLight.position.set(-5, 3, -5);
     scene.add(rimLight);
 
-    // Load the crowd model
     const loader = new GLTFLoader();
-
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
     loader.setDRACOLoader(dracoLoader);
@@ -750,7 +706,6 @@
       'final-crows-test.glb',
       (gltf) => {
         crowd = gltf.scene;
-
         crowd.scale.set(5, 5, 5);
 
         const box = new THREE.Box3().setFromObject(crowd);
@@ -769,8 +724,6 @@
         }
 
         document.getElementById('loading').style.display = 'none';
-
-        // ✅ in case layout shifts, keep scroll height correct
         refreshSmoothScroll();
       },
       (progress) => {
@@ -783,7 +736,6 @@
       }
     );
 
-    // Animation loop
     const clock = new THREE.Clock();
     let targetPosition = new THREE.Vector3(0, 0, 0);
     let mouseX = 0;
@@ -793,7 +745,6 @@
       requestAnimationFrame(animate);
 
       const delta = clock.getDelta();
-
       if (mixer) mixer.update(delta);
 
       if (crowd) {
@@ -806,11 +757,9 @@
 
         if (Math.abs(dx) > 0.01) {
           const targetRotation = Math.atan2(dx, 1) + Math.PI;
-
           let rotDiff = targetRotation - crowd.rotation.y;
           while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
           while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
-
           crowd.rotation.y += rotDiff * 0.1;
         }
       }
@@ -820,122 +769,82 @@
 
     animate();
 
-    // Handle window resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      // keep inertia height correct
       refreshSmoothScroll();
     });
 
-    // Mouse tracking - only horizontal movement
     document.addEventListener('mousemove', (event) => {
       mouseX = (event.clientX / window.innerWidth) * 2 - 1;
       mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-
       targetPosition.x = mouseX * 5;
     });
 
-    // Wait for DOM to be fully loaded
-    window.addEventListener('DOMContentLoaded', () => {
-      // Expanding gradient circle on scroll
-      const expandingGradient = document.querySelector('.expanding-gradient-bg');
-      const gradientReturnSection = document.querySelector('.gradient-return-section');
-      const gradientReturnContent = document.querySelector('.gradient-return-content');
-      const whiteSection = document.querySelector('.white-section');
+    // FIXED: Scroll effects handler - now triggers properly
+    const expandingGradient = document.querySelector('.expanding-gradient-bg');
+    const gradientReturnSection = document.querySelector('.gradient-return-section');
+    const gradientReturnContent = document.querySelector('.gradient-return-content');
+    const whiteSection = document.querySelector('.white-section');
 
-      // Get all revealable elements
-      const heroTitle = document.querySelector('h1');
-      const taglines = document.querySelectorAll('.tagline');
-      const footerTags = document.querySelector('.footer-tags');
-      const whiteSectionH2 = document.querySelector('.white-section h2');
-      const whiteSectionPs = document.querySelectorAll('.white-section p');
+    const heroTitle = document.querySelector('h1');
+    const taglines = document.querySelectorAll('.tagline');
+    const footerTags = document.querySelector('.footer-tags');
+    const whiteSectionH2 = document.querySelector('.white-section h2');
+    const whiteSectionPs = document.querySelectorAll('.white-section p');
 
-      function handleScrollEffects() {
-        const scrollY = window.scrollY;
-        const viewportHeight = window.innerHeight;
+    function handleScrollEffects() {
+      const scrollY = window.scrollY;
+      const viewportHeight = window.innerHeight;
 
-        // Get hero section and gradient elements
-        const heroSection = document.getElementById('hero-section');
-        const orbs = [
-          document.querySelector('.gradient-orb-1'),
-          document.querySelector('.gradient-orb-2'),
-          document.querySelector('.gradient-orb-3')
-        ];
-        const noise = document.querySelector('.noise-overlay');
-        const vignette = document.querySelector('.vignette');
-        const canvasContainer = document.getElementById('canvas-container');
+      // Reveal hero elements immediately on load
+      if (heroTitle) heroTitle.classList.add('revealed');
+      if (taglines) taglines.forEach(tag => tag.classList.add('revealed'));
+      if (footerTags) footerTags.classList.add('revealed');
 
-        // Hide hero gradient completely when we reach the gradient return section
-        if (gradientReturnSection) {
-          const gradientSectionTop = gradientReturnSection.offsetTop;
-          const hideThreshold = gradientSectionTop - viewportHeight * 0.5;
+      // Handle white section reveals
+      if (whiteSection) {
+        const whiteSectionTop = whiteSection.offsetTop;
+        const scrollPosition = scrollY + viewportHeight * 0.6;
 
-          if (scrollY > hideThreshold) {
-            heroSection.style.setProperty('--gradient-opacity', '0');
-            orbs.forEach(orb => { if (orb) orb.style.opacity = '0'; });
-            if (noise) noise.style.opacity = '0';
-            if (vignette) vignette.style.opacity = '0';
-            if (canvasContainer) canvasContainer.style.opacity = '0';
-          } else {
-            heroSection.style.setProperty('--gradient-opacity', '1');
-            orbs.forEach(orb => { if (orb) orb.style.opacity = ''; });
-            if (noise) noise.style.opacity = '';
-            if (vignette) vignette.style.opacity = '';
-            if (canvasContainer) canvasContainer.style.opacity = '0.85';
-          }
-        }
-
-        // Reveal hero elements on load/scroll
-        if (scrollY < viewportHeight * 1.5) {
-          if (heroTitle) heroTitle.classList.add('revealed');
-          if (taglines) taglines.forEach(tag => tag.classList.add('revealed'));
-          if (footerTags) footerTags.classList.add('revealed');
-        }
-
-        // Handle white section reveals
-        if (whiteSection) {
-          const whiteSectionTop = whiteSection.offsetTop;
-          const scrollPosition = scrollY + viewportHeight * 0.6;
-
-          if (scrollPosition > whiteSectionTop) {
-            if (whiteSectionH2) whiteSectionH2.classList.add('revealed');
-            if (whiteSectionPs) whiteSectionPs.forEach(p => p.classList.add('revealed'));
-          }
-        }
-
-        // Handle gradient circle expansion
-        if (gradientReturnSection && expandingGradient) {
-          const gradientSectionTop = gradientReturnSection.offsetTop;
-          const gradientSectionHeight = gradientReturnSection.offsetHeight;
-          const viewportScroll = scrollY + viewportHeight;
-
-          if (viewportScroll > gradientSectionTop) {
-            const progress = Math.min((viewportScroll - gradientSectionTop) / gradientSectionHeight, 1);
-
-            const maxSize = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 2.5;
-            const size = 100 + (progress * maxSize);
-
-            expandingGradient.style.width = `${size}px`;
-            expandingGradient.style.height = `${size}px`;
-
-            if (progress > 0.3) {
-              if (gradientReturnContent) gradientReturnContent.classList.add('visible');
-            }
-          }
+        if (scrollPosition > whiteSectionTop) {
+          if (whiteSectionH2) whiteSectionH2.classList.add('revealed');
+          if (whiteSectionPs) whiteSectionPs.forEach(p => p.classList.add('revealed'));
         }
       }
 
-      window.addEventListener('scroll', handleScrollEffects, { passive: true });
+      // Handle gradient circle expansion
+      if (gradientReturnSection && expandingGradient) {
+        const gradientSectionTop = gradientReturnSection.offsetTop;
+        const gradientSectionHeight = gradientReturnSection.offsetHeight;
+        const viewportScroll = scrollY + viewportHeight;
 
+        if (viewportScroll > gradientSectionTop) {
+          const progress = Math.min((viewportScroll - gradientSectionTop) / gradientSectionHeight, 1);
+
+          const maxSize = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 2.5;
+          const size = 100 + (progress * maxSize);
+
+          expandingGradient.style.width = `${size}px`;
+          expandingGradient.style.height = `${size}px`;
+
+          if (progress > 0.3) {
+            if (gradientReturnContent) gradientReturnContent.classList.add('visible');
+          }
+        }
+      }
+    }
+
+    // Trigger on scroll AND on load
+    window.addEventListener('scroll', handleScrollEffects, { passive: true });
+    
+    // Initial trigger
+    setTimeout(() => {
       handleScrollEffects();
-
-      // after initial layout, ensure body height correct
       refreshSmoothScroll();
-    });
+    }, 100);
   </script>
 </body>
 </html>
