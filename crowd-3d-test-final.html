@@ -14,10 +14,24 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow-x: hidden;
+            background: white;
+            /* Smooth scroll inertia for webkit browsers */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Sticky hero container */
+        .hero-sticky-container {
+            position: relative;
+            height: 200vh; /* Extra height for scroll */
         }
 
         #hero-section {
-            position: relative;
+            position: sticky;
+            top: 0;
             width: 100%;
             height: 100vh;
             background: #0a4d5c;
@@ -326,59 +340,191 @@
                 gap: 30px;
             }
         }
+
+        /* White content section */
+        .white-section {
+            position: relative;
+            min-height: 100vh;
+            background: white;
+            padding: 120px 60px;
+            z-index: 30;
+        }
+
+        .white-section-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            filter: blur(15px);
+            opacity: 0.5;
+            transition: filter 0.8s ease, opacity 0.8s ease;
+        }
+
+        .white-section-content.in-focus {
+            filter: blur(0px);
+            opacity: 1;
+        }
+
+        .white-section h2 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 300;
+            line-height: 1.2;
+            margin-bottom: 40px;
+            color: #0a4d5c;
+        }
+
+        .white-section p {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: #555;
+            max-width: 800px;
+        }
+
+        /* Gradient return section with expanding circle */
+        .gradient-return-section {
+            position: relative;
+            min-height: 150vh;
+            background: white;
+            /* NO overflow hidden - let circle expand freely */
+        }
+
+        .expanding-gradient-bg {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(50%); /* Start half-visible at bottom */
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #0a4d5c;
+            z-index: 1;
+            transition: width 0.05s linear, height 0.05s linear;
+        }
+
+        .expanding-gradient-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle at center, #14b8a6 0%, #06b6d4 30%, #0891b2 50%, #134e4a 80%, #0a4d5c 100%);
+            opacity: 1;
+        }
+
+        /* Decorative circles inside gradient */
+        .expanding-gradient-bg::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gradient-return-content {
+            position: relative;
+            z-index: 2;
+            padding: 120px 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            color: white;
+            opacity: 0;
+            filter: blur(20px);
+            transition: opacity 0.8s ease, filter 0.8s ease;
+        }
+
+        .gradient-return-content.visible {
+            opacity: 1;
+            filter: blur(0px);
+        }
+
+        .gradient-return-content h2 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 300;
+            line-height: 1.2;
+            margin-bottom: 40px;
+        }
+
+        .gradient-return-content p {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            max-width: 800px;
+        }
     </style>
 </head>
 <body>
-    <section id="hero-section">
-        <!-- Gradient orbs -->
-        <div class="gradient-orb-1"></div>
-        <div class="gradient-orb-2"></div>
-        <div class="gradient-orb-3"></div>
-        <div class="noise-overlay"></div>
-        <div class="vignette"></div>
+    <div class="hero-sticky-container">
+        <section id="hero-section">
+            <!-- Gradient orbs -->
+            <div class="gradient-orb-1"></div>
+            <div class="gradient-orb-2"></div>
+            <div class="gradient-orb-3"></div>
+            <div class="noise-overlay"></div>
+            <div class="vignette"></div>
 
-        <!-- Logo -->
-        <div class="logo">
-            <span class="logo-be">Be.</span><span class="logo-design">Design</span>
-        </div>
+            <!-- Logo -->
+            <div class="logo">
+                <span class="logo-be">Be.</span><span class="logo-design">Design</span>
+            </div>
 
-        <!-- Navigation -->
-        <nav>
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#work">Our Work</a>
-            <a href="#contact">Contact</a>
-        </nav>
+            <!-- Navigation -->
+            <nav>
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#work">Our Work</a>
+                <a href="#contact">Contact</a>
+            </nav>
 
-        <div id="canvas-container"></div>
-        
-        <div id="loading">
-            <div class="spinner"></div>
-            <p>Loading experience...</p>
-        </div>
-
-        <div id="hero-content">
-            <h1>
-                <span class="title-prefix">Be.</span><span class="highlight-human">inspired</span> 
-                <span class="title-prefix">Be.</span><span class="highlight-curious">immersed</span> 
-                <span class="title-prefix">Be.</span><span class="highlight-design">intentional</span>
-            </h1>
+            <div id="canvas-container"></div>
             
-            <div class="tagline-grid">
-                <p class="tagline">
-                    Great design guides users naturally, shaping behaviour, driving outcomes, creating impact.
-                </p>
-                <p class="tagline">
-                    Great design guides users naturally, shaping behaviour, driving outcomes, creating impact.
-                </p>
-                <p class="tagline">
-                    Great design guides users naturally, shaping behaviour, driving outcomes, creating impact.
-                </p>
+            <div id="loading">
+                <div class="spinner"></div>
+                <p>Loading experience...</p>
             </div>
 
-            <div class="footer-tags">
-                HUMAN COMPUTER INTERACTION | ACCESSIBLE DESIGN | STRATEGIC VISUALS | HUMAN COMPLEXITY
+            <div id="hero-content">
+                <h1>
+                    <span class="title-prefix">Be.</span><span class="highlight-human">inspired</span> 
+                    <span class="title-prefix">Be.</span><span class="highlight-curious">immersed</span> 
+                    <span class="title-prefix">Be.</span><span class="highlight-design">intentional</span>
+                </h1>
+                
+                <div class="tagline-grid">
+                    <p class="tagline">
+                        Great design guides users naturally, shaping behaviour, driving outcomes, creating impact.
+                    </p>
+                    <p class="tagline">
+                        Great design guides users naturally, shaping behaviour, driving outcomes, creating impact.
+                    </p>
+                    <p class="tagline">
+                        Great design guides users naturally, shaping behaviour, driving outcomes, creating impact.
+                    </p>
+                </div>
+
+                <div class="footer-tags">
+                    HUMAN COMPUTER INTERACTION | ACCESSIBLE DESIGN | STRATEGIC VISUALS | HUMAN COMPLEXITY
+                </div>
             </div>
+        </section>
+    </div>
+
+    <!-- White content section -->
+    <section class="white-section">
+        <div class="white-section-content">
+            <h2>Our Approach</h2>
+            <p>We believe design is more than aesthetics—it's about understanding human behavior, anticipating needs, and creating experiences that feel intuitive and meaningful. Every project begins with empathy and ends with impact.</p>
+            <br><br>
+            <p>Through careful research, thoughtful iteration, and close collaboration, we craft digital experiences that not only meet business goals but also resonate deeply with the people who use them.</p>
+        </div>
+    </section>
+
+    <!-- Gradient return section -->
+    <section class="gradient-return-section">
+        <div class="expanding-gradient-bg"></div>
+        <div class="gradient-return-content">
+            <h2>Ready to create something meaningful?</h2>
+            <p>Let's explore how thoughtful design can transform your product and connect with your audience in ways that matter.</p>
         </div>
     </section>
 
@@ -390,6 +536,21 @@
         }
     }
     </script>
+
+    <!-- Smooth scroll with inertia -->
+    <style>
+        * {
+            scroll-behavior: smooth;
+        }
+        
+        html {
+            scroll-snap-type: y proximity;
+        }
+        
+        body {
+            overscroll-behavior: none;
+        }
+    </style>
 
     <script type="module">
         import * as THREE from 'three';
@@ -547,6 +708,75 @@
             targetPosition.x = mouseX * 5;
             // Z stays at 0 - no forward/back movement
         });
+
+        // Expanding gradient circle on scroll
+        const expandingGradient = document.querySelector('.expanding-gradient-bg');
+        const gradientReturnSection = document.querySelector('.gradient-return-section');
+        const gradientReturnContent = document.querySelector('.gradient-return-content');
+        const whiteSection = document.querySelector('.white-section');
+        const whiteSectionContent = document.querySelector('.white-section-content');
+
+        // Smooth scroll with momentum
+        let targetScroll = window.scrollY;
+        let currentScroll = window.scrollY;
+        const ease = 0.08; // Lower = smoother/slower
+
+        function smoothScroll() {
+            currentScroll += (targetScroll - currentScroll) * ease;
+            
+            if (Math.abs(targetScroll - currentScroll) < 0.5) {
+                currentScroll = targetScroll;
+            }
+
+            // Use the smoothed scroll value for calculations
+            handleScrollEffects(currentScroll);
+            
+            requestAnimationFrame(smoothScroll);
+        }
+
+        // Update target scroll on actual scroll
+        window.addEventListener('scroll', () => {
+            targetScroll = window.scrollY;
+        }, { passive: true });
+
+        function handleScrollEffects(scrollY) {
+            const viewportHeight = window.innerHeight;
+            
+            // Handle white section blur effect
+            const whiteSectionTop = whiteSection.offsetTop;
+            const whiteSectionHeight = whiteSection.offsetHeight;
+            const scrollPosition = scrollY + viewportHeight * 0.7;
+            
+            if (scrollPosition > whiteSectionTop && scrollPosition < whiteSectionTop + whiteSectionHeight) {
+                whiteSectionContent.classList.add('in-focus');
+            }
+            
+            // Handle gradient circle expansion
+            const gradientSectionTop = gradientReturnSection.offsetTop;
+            const gradientSectionHeight = gradientReturnSection.offsetHeight;
+            const viewportScroll = scrollY + viewportHeight;
+            
+            if (viewportScroll > gradientSectionTop) {
+                const progress = Math.min((viewportScroll - gradientSectionTop) / gradientSectionHeight, 1);
+                
+                // Expand circle from 100px to full screen coverage
+                const maxSize = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 2.5;
+                const size = 100 + (progress * maxSize);
+                
+                expandingGradient.style.width = `${size}px`;
+                expandingGradient.style.height = `${size}px`;
+                
+                // Show content when circle is large enough
+                if (progress > 0.3) {
+                    gradientReturnContent.classList.add('visible');
+                } else {
+                    gradientReturnContent.classList.remove('visible');
+                }
+            }
+        }
+
+        // Start smooth scroll loop
+        smoothScroll();
     </script>
 </body>
 </html>
