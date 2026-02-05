@@ -662,8 +662,8 @@
             0.1,
             1000
         );
-        camera.position.set(0, 1.8, 12);
-        camera.lookAt(0, 1, 0);
+        camera.position.set(0, 2.2, 12); // Raised from 1.8 to 2.2
+        camera.lookAt(0, 1.2, 0); // Look slightly lower
 
         // Renderer
         const renderer = new THREE.WebGLRenderer({ 
@@ -712,7 +712,7 @@
                 const box = new THREE.Box3().setFromObject(crowd);
                 const center = box.getCenter(new THREE.Vector3());
                 crowd.position.sub(center);
-                crowd.position.y = 0;
+                crowd.position.y = -0.3; // Moved down from 0 to -0.3 to prevent clipping
 
                 scene.add(crowd);
 
@@ -805,19 +805,43 @@
 
         // Wait for DOM to be fully loaded
         window.addEventListener('DOMContentLoaded', () => {
-            // Smooth momentum scrolling
-            let targetScroll = 0;
-            let currentScroll = 0;
-            let velocity = 0;
-            const friction = 0.85; // Higher = more glide (0-1)
-            const ease = 0.12;
+            // Smooth momentum scrolling with real inertia
+            let scrollVelocity = 0;
+            let lastScrollY = window.scrollY;
+            let lastTimestamp = Date.now();
+            let rafId = null;
+            let isScrolling = false;
+            let scrollTimeout = null;
+            
+            const friction = 0.92; // Higher = more glide (0.9-0.95 feels best)
+            const minVelocity = 0.1; // Stop threshold
 
-            // Get actual scroll position
-            function updateTargetScroll() {
-                targetScroll = window.scrollY;
-            }
-
-            window.addEventListener('scroll', updateTargetScroll, { passive: true });
+            // Track actual scroll events
+            window.addEventListener('scroll', () => {
+                const now = Date.now();
+                const currentScrollY = window.scrollY;
+                const timeDelta = Math.max(now - lastTimestamp, 1);
+                
+                // Calculate velocity based on scroll distance over time
+                const scrollDelta = currentScrollY - lastScrollY;
+                scrollVelocity = (scrollDelta / timeDelta) * 16; // Normalize to 60fps
+                
+                lastScrollY = currentScrollY;
+                lastTimestamp = now;
+                isScrolling = true;
+                
+                // Clear existing timeout
+                clearTimeout(scrollTimeout);
+                
+                // Detect when user stops scrolling
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                    // Start momentum animation
+                    if (!rafId) {
+                        applyMomentum();
+                    }
+                }, 50);
+            }, { passive: true });
 
             // Expanding gradient circle on scroll
             const expandingGradient = document.querySelector('.expanding-gradient-bg');
@@ -914,32 +938,43 @@
                 }
             }
 
-            // Apply momentum
+            // Apply momentum when user stops scrolling
             function applyMomentum() {
-                // Calculate velocity
-                velocity = (targetScroll - currentScroll) * ease;
-                
-                // Apply friction for that glide effect
-                velocity *= friction;
-                
-                // Update current scroll
-                currentScroll += velocity;
-                
-                // Stop when close enough
-                if (Math.abs(velocity) < 0.1) {
-                    currentScroll = targetScroll;
-                    velocity = 0;
+                if (isScrolling) {
+                    // User is actively scrolling, stop momentum
+                    rafId = null;
+                    return;
                 }
                 
-                handleScrollEffects(currentScroll);
-                requestAnimationFrame(applyMomentum);
+                // Apply friction
+                scrollVelocity *= friction;
+                
+                // Stop if velocity is too small
+                if (Math.abs(scrollVelocity) < minVelocity) {
+                    scrollVelocity = 0;
+                    rafId = null;
+                    return;
+                }
+                
+                // Apply velocity to scroll position
+                const newScrollY = window.scrollY + scrollVelocity;
+                window.scrollTo(0, newScrollY);
+                
+                // Continue animation
+                rafId = requestAnimationFrame(applyMomentum);
+            }
+
+            // Listen for actual scroll to update effects
+            function onScroll() {
+                handleScrollEffects(window.scrollY);
+                requestAnimationFrame(onScroll);
             }
 
             // Initial reveal check
             handleScrollEffects(window.scrollY);
             
-            // Start momentum loop
-            applyMomentum();
+            // Start continuous scroll effects monitoring
+            onScroll();
         });
     </script>
 </body>
