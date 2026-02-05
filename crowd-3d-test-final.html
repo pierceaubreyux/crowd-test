@@ -18,7 +18,7 @@
       background: white;
     }
 
-    /* Hero container - content scrolls, background stays fixed */
+    /* Hero container */
     .hero-sticky-container {
       position: relative;
       min-height: 100vh;
@@ -30,11 +30,11 @@
       min-height: 100vh;
       background: #0a4d5c;
       overflow: visible;
-      padding-bottom: 200px; /* Extra space so content can scroll */
+      padding-bottom: 200px;
       --gradient-opacity: 1;
     }
 
-    /* Canvas stays fixed */
+    /* FIXED BACKGROUNDS - outside smooth wrapper */
     #canvas-container {
       position: fixed;
       top: 0;
@@ -51,36 +51,6 @@
       pointer-events: auto;
     }
 
-    /* Base gradient layer - fixed and stays behind */
-    #hero-section::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 100% 80% at 50% 0%, #14b8a6 0%, transparent 60%),
-        radial-gradient(ellipse 80% 60% at 80% 30%, #06b6d4 0%, transparent 50%),
-        radial-gradient(ellipse 70% 60% at 20% 40%, #0891b2 0%, transparent 50%),
-        radial-gradient(ellipse 120% 100% at 50% 100%, #134e4a 0%, transparent 60%),
-        linear-gradient(135deg, #0f766e 0%, #164e63 50%, #134e4a 100%);
-      opacity: var(--gradient-opacity, 1);
-      animation: breathe 8s ease-in-out infinite;
-      z-index: 1;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-    }
-
-    @keyframes breathe {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1.05);
-        opacity: 0.95;
-      }
-    }
-
-    /* Animated gradient orbs - fixed position */
     .gradient-orb-1 {
       position: fixed;
       width: 1000px;
@@ -168,7 +138,33 @@
       }
     }
 
-    /* Noise texture for depth - fixed */
+    .fixed-gradient-bg {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 100% 80% at 50% 0%, #14b8a6 0%, transparent 60%),
+        radial-gradient(ellipse 80% 60% at 80% 30%, #06b6d4 0%, transparent 50%),
+        radial-gradient(ellipse 70% 60% at 20% 40%, #0891b2 0%, transparent 50%),
+        radial-gradient(ellipse 120% 100% at 50% 100%, #134e4a 0%, transparent 60%),
+        linear-gradient(135deg, #0f766e 0%, #164e63 50%, #134e4a 100%);
+      opacity: 1;
+      animation: breathe 8s ease-in-out infinite;
+      z-index: 1;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.95;
+      }
+    }
+
     .noise-overlay {
       position: fixed;
       inset: 0;
@@ -179,7 +175,6 @@
       z-index: 3;
     }
 
-    /* Subtle vignette - fixed */
     .vignette {
       position: fixed;
       inset: 0;
@@ -477,7 +472,7 @@
       transform: translateY(0);
     }
 
-    /* Inertia scroll scaffold */
+    /* Inertia scroll */
     html, body { height: 100%; }
 
     body {
@@ -493,6 +488,7 @@
       width: 100%;
       height: 100%;
       will-change: transform;
+      z-index: 10;
     }
 
     #smooth-content {
@@ -516,16 +512,21 @@
 </head>
 
 <body>
+  <!-- FIXED BACKGROUNDS - Outside smooth wrapper -->
+  <div class="fixed-gradient-bg"></div>
+  <div class="gradient-orb-1"></div>
+  <div class="gradient-orb-2"></div>
+  <div class="gradient-orb-3"></div>
+  <div class="noise-overlay"></div>
+  <div class="vignette"></div>
+  <div id="canvas-container"></div>
+
+  <!-- SCROLLING CONTENT - Inside smooth wrapper -->
   <div id="smooth-wrapper">
     <div id="smooth-content">
 
       <div class="hero-sticky-container">
         <section id="hero-section">
-          <div class="gradient-orb-1"></div>
-          <div class="gradient-orb-2"></div>
-          <div class="gradient-orb-3"></div>
-          <div class="noise-overlay"></div>
-          <div class="vignette"></div>
 
           <div class="logo">
             <span class="logo-be">Be.</span><span class="logo-design">Design</span>
@@ -537,8 +538,6 @@
             <a href="#work">Our Work</a>
             <a href="#contact">Contact</a>
           </nav>
-
-          <div id="canvas-container"></div>
 
           <div id="loading">
             <div class="spinner"></div>
@@ -783,7 +782,7 @@
       targetPosition.x = mouseX * 5;
     });
 
-    // FIXED: Scroll effects handler - now triggers properly
+    // Scroll effects
     const expandingGradient = document.querySelector('.expanding-gradient-bg');
     const gradientReturnSection = document.querySelector('.gradient-return-section');
     const gradientReturnContent = document.querySelector('.gradient-return-content');
@@ -795,21 +794,23 @@
     const whiteSectionH2 = document.querySelector('.white-section h2');
     const whiteSectionPs = document.querySelectorAll('.white-section p');
 
+    // Fixed background elements
+    const fixedGradientBg = document.querySelector('.fixed-gradient-bg');
+    const orbs = [
+      document.querySelector('.gradient-orb-1'),
+      document.querySelector('.gradient-orb-2'),
+      document.querySelector('.gradient-orb-3')
+    ];
+    const noise = document.querySelector('.noise-overlay');
+    const vignette = document.querySelector('.vignette');
+    const canvasContainer = document.getElementById('canvas-container');
+
     function handleScrollEffects() {
       const scrollY = window.scrollY;
       const viewportHeight = window.innerHeight;
 
-      const heroSection = document.getElementById('hero-section');
-      const orbs = [
-        document.querySelector('.gradient-orb-1'),
-        document.querySelector('.gradient-orb-2'),
-        document.querySelector('.gradient-orb-3')
-      ];
-      const noise = document.querySelector('.noise-overlay');
-      const vignette = document.querySelector('.vignette');
-      const canvasContainer = document.getElementById('canvas-container');
-
       // Fade out fixed backgrounds when scrolling past hero
+      const heroSection = document.getElementById('hero-section');
       if (heroSection) {
         const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
         const fadeStart = heroBottom - viewportHeight;
@@ -819,13 +820,13 @@
           const fadeProgress = Math.min((scrollY - fadeStart) / (fadeEnd - fadeStart), 1);
           const opacity = 1 - fadeProgress;
 
-          heroSection.style.setProperty('--gradient-opacity', opacity);
+          if (fixedGradientBg) fixedGradientBg.style.opacity = opacity;
           orbs.forEach(orb => { if (orb) orb.style.opacity = opacity; });
           if (noise) noise.style.opacity = opacity * 0.015;
           if (vignette) vignette.style.opacity = opacity;
           if (canvasContainer) canvasContainer.style.opacity = opacity * 0.85;
         } else {
-          heroSection.style.setProperty('--gradient-opacity', '1');
+          if (fixedGradientBg) fixedGradientBg.style.opacity = '1';
           orbs.forEach(orb => { if (orb) orb.style.opacity = ''; });
           if (noise) noise.style.opacity = '';
           if (vignette) vignette.style.opacity = '';
@@ -833,12 +834,12 @@
         }
       }
 
-      // Reveal hero elements immediately on load
+      // Reveal hero elements
       if (heroTitle) heroTitle.classList.add('revealed');
       if (taglines) taglines.forEach(tag => tag.classList.add('revealed'));
       if (footerTags) footerTags.classList.add('revealed');
 
-      // Handle white section reveals
+      // White section reveals
       if (whiteSection) {
         const whiteSectionTop = whiteSection.offsetTop;
         const scrollPosition = scrollY + viewportHeight * 0.6;
@@ -849,7 +850,7 @@
         }
       }
 
-      // Handle gradient circle expansion
+      // Circle expansion
       if (gradientReturnSection && expandingGradient) {
         const gradientSectionTop = gradientReturnSection.offsetTop;
         const gradientSectionHeight = gradientReturnSection.offsetHeight;
@@ -871,10 +872,8 @@
       }
     }
 
-    // Trigger on scroll AND on load
     window.addEventListener('scroll', handleScrollEffects, { passive: true });
     
-    // Initial trigger
     setTimeout(() => {
       handleScrollEffects();
       refreshSmoothScroll();
