@@ -97,6 +97,22 @@
       transition: opacity 0.5s ease;
     }
 
+    /* Dark depth orb for ocean-like feel */
+    .gradient-orb-4 {
+      position: fixed;
+      width: 1200px;
+      height: 1200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(8, 47, 73, 0.8) 0%, transparent 60%);
+      filter: blur(150px);
+      bottom: -20%;
+      left: 20%;
+      animation: float4 25s ease-in-out infinite;
+      z-index: 1;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
     @keyframes float1 {
       0%, 100% {
         transform: translateX(-50%) translateY(0) scale(1);
@@ -138,6 +154,17 @@
       }
     }
 
+    @keyframes float4 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+      }
+      50% {
+        transform: translate(60px, -40px) scale(1.15);
+        opacity: 0.9;
+      }
+    }
+
     .fixed-gradient-bg {
       position: fixed;
       inset: 0;
@@ -145,8 +172,10 @@
         radial-gradient(ellipse 100% 80% at 50% 0%, #22d3ee 0%, transparent 60%),
         radial-gradient(ellipse 80% 60% at 80% 30%, #06b6d4 0%, transparent 50%),
         radial-gradient(ellipse 70% 60% at 20% 40%, #0ea5e9 0%, transparent 50%),
-        radial-gradient(ellipse 120% 100% at 50% 100%, #0891b2 0%, transparent 60%),
-        linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0e7490 100%);
+        radial-gradient(ellipse 120% 100% at 50% 100%, #0c4a6e 0%, transparent 60%),
+        radial-gradient(ellipse 150% 120% at 30% 80%, #082f49 0%, transparent 70%),
+        radial-gradient(ellipse 100% 100% at 70% 70%, #0a3a5c 0%, transparent 65%),
+        linear-gradient(180deg, #0c4a6e 0%, #082f49 40%, #051e34 100%);
       opacity: 1;
       animation: breathe 6s ease-in-out infinite;
       z-index: 1;
@@ -517,6 +546,7 @@
   <div class="gradient-orb-1"></div>
   <div class="gradient-orb-2"></div>
   <div class="gradient-orb-3"></div>
+  <div class="gradient-orb-4"></div>
   <div class="noise-overlay"></div>
   <div class="vignette"></div>
   <div id="canvas-container"></div>
@@ -799,7 +829,8 @@
     const orbs = [
       document.querySelector('.gradient-orb-1'),
       document.querySelector('.gradient-orb-2'),
-      document.querySelector('.gradient-orb-3')
+      document.querySelector('.gradient-orb-3'),
+      document.querySelector('.gradient-orb-4')
     ];
     const noise = document.querySelector('.noise-overlay');
     const vignette = document.querySelector('.vignette');
