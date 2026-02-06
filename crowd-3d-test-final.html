@@ -24,23 +24,40 @@
     /* Custom Cursor */
     .custom-cursor {
       position: fixed;
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(208, 255, 113, 0.6);
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(208, 255, 113, 0.5);
       border-radius: 50%;
       pointer-events: none;
       z-index: 10000;
-      transition: transform 0.15s ease, opacity 0.3s ease;
+      transition: transform 0.15s ease, opacity 0.3s ease, border-width 0.3s ease;
       mix-blend-mode: difference;
     }
 
+    .cursor-dot {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: rgba(208, 255, 113, 0.9);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10001;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
     .custom-cursor.hover {
-      transform: scale(2);
-      background: rgba(208, 255, 113, 0.1);
+      transform: scale(1.8);
+      border-width: 2px;
+      background: rgba(208, 255, 113, 0.05);
+    }
+
+    .cursor-dot.hover {
+      transform: scale(0);
+      opacity: 0;
     }
 
     @media (pointer: coarse) {
-      .custom-cursor { display: none; }
+      .custom-cursor, .cursor-dot { display: none; }
       body { cursor: auto; }
     }
 
@@ -69,7 +86,7 @@
     #canvas-container {
       position: fixed;
       top: 150px;
-      right: -100px;
+      left: 0;
       width: 100%;
       height: 100vh;
       opacity: 0.9;
@@ -460,10 +477,11 @@
       gap: 40px;
       width: 100%;
       margin-bottom: 60px;
+      margin-top: 60px;
     }
 
     .tagline {
-      font-size: clamp(1rem, 1.5vw, 1.8vw);
+      font-size: clamp(1rem, 1.8vw, 1.8vw);
       line-height: 1.6;
       color: rgba(255, 255, 255, 0.9);
       font-weight: 300;
@@ -478,10 +496,10 @@
 
     .tagline.revealed {
       filter: blur(0px);
-      opacity: 1;
+      opacity: 0.95;
       transform: translateY(0);
       font-family: 'Aloe';
-      width: 40%;
+      width: 60%;
     }
 
     @media (max-width: 768px) {
@@ -585,7 +603,7 @@
     .gradient-return-section {
       position: relative;
       min-height: 150vh;
-      background: #f8f9fa;
+      background: white;
       z-index: 30;
     }
 
@@ -729,7 +747,9 @@
 
 <body>
   <!-- Custom Cursor -->
-  <div class="custom-cursor"></div>
+  <div class="custom-cursor">
+    <div class="cursor-dot"></div>
+  </div>
 
   <!-- FIXED BACKGROUNDS -->
   <div class="fixed-gradient-bg"></div>
@@ -766,8 +786,8 @@
 
           <div id="hero-content">
             <h1>
-              <span class="title-prefix">Be<span class="green">.</span></span><span class="highlight-human">inspired</span><br>
-              <span class="title-prefix">Be<span class="green">.</span></span><span class="highlight-curious">immersed</span><br>
+              <span class="title-prefix">Be<span class="green">.</span></span><span class="highlight-human">inspired</span>
+              <span class="title-prefix">Be<span class="green">.</span></span><span class="highlight-curious">immersed</span>
               <span class="title-prefix">Be<span class="green">.</span></span><span class="highlight-design">intentional</span>
             </h1>
 
@@ -824,29 +844,41 @@
 
     // Custom Cursor
     const cursor = document.querySelector('.custom-cursor');
+    const cursorDot = document.querySelector('.cursor-dot');
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-    if (!isTouchDevice && cursor) {
+    if (!isTouchDevice && cursor && cursorDot) {
       let mouseX = 0, mouseY = 0;
       let cursorX = 0, cursorY = 0;
 
       document.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
+        
+        // Dot follows mouse immediately - centered by offsetting by half its size (2px)
+        cursorDot.style.left = (mouseX - 2) + 'px';
+        cursorDot.style.top = (mouseY - 2) + 'px';
       });
 
+      // Ring follows with lag - centered by offsetting by half its size (15px)
       function animateCursor() {
         cursorX += (mouseX - cursorX) * 0.15;
         cursorY += (mouseY - cursorY) * 0.15;
-        cursor.style.left = cursorX + 'px';
-        cursor.style.top = cursorY + 'px';
+        cursor.style.left = (cursorX - 15) + 'px';
+        cursor.style.top = (cursorY - 15) + 'px';
         requestAnimationFrame(animateCursor);
       }
       animateCursor();
 
-      document.querySelectorAll('a, button').forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+      document.querySelectorAll('a, button, .logo').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursor.classList.add('hover');
+          cursorDot.classList.add('hover');
+        });
+        el.addEventListener('mouseleave', () => {
+          cursor.classList.remove('hover');
+          cursorDot.classList.remove('hover');
+        });
       });
     }
 
