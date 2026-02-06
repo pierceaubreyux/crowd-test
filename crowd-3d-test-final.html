@@ -58,6 +58,13 @@
       padding-bottom: 200px;
     }
 
+    @media (max-width: 768px) {
+      #hero-section {
+        background: linear-gradient(180deg, #0c4a6e 0%, #082f49 100%);
+        padding-bottom: 100px;
+      }
+    }
+
     /* Enhanced gradient with more movement */
     #canvas-container {
       position: fixed;
@@ -214,6 +221,32 @@
       z-index: 1;
       pointer-events: none;
       transition: opacity 0.8s ease;
+    }
+
+    @media (max-width: 768px) {
+      .fixed-gradient-bg {
+        display: none; /* Hide gradient on mobile */
+      }
+      
+      .gradient-orb-1,
+      .gradient-orb-2,
+      .gradient-orb-3,
+      .gradient-orb-4 {
+        display: none; /* Hide orbs on mobile */
+      }
+      
+      .noise-overlay {
+        display: none; /* Hide noise on mobile */
+      }
+      
+      .vignette {
+        display: none; /* Hide vignette on mobile */
+      }
+      
+      /* Add simple mobile background */
+      body {
+        background: linear-gradient(180deg, #0c4a6e 0%, #082f49 50%, #051e34 100%);
+      }
     }
 
     @keyframes breathe {
@@ -671,6 +704,14 @@
       }
       body {
         height: auto !important;
+      }
+      
+      /* Disable all animations on mobile */
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition-duration: 0.3s !important;
       }
     }
 
